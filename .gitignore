@@ -1,0 +1,5 @@
+OpenglLearn/x64
+*.suo
+*.VC.db
+*.ipch
+*.lib
