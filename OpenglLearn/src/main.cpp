@@ -3,6 +3,7 @@
 #include<iostream>
 #include"Shader.h"
 #include"Help.h"
+#include"Texture.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -18,10 +19,10 @@ void processInput(GLFWwindow* window)
 }
 
 float vertices[] = {
-	0.5,0.5,0.0f,1.0f,0.0f,0.0f,
-	0.5f,-0.5f,0.0f,0.0f,1.0f,0.0f,
-	-0.5f,-0.5f,0.0f,0.0f,0.0f,1.0f,
-	-0.5,0.5,0.0f,0.0f,1.0f,1.0f
+	0.5,0.5,0.0f,      1.0f,0.0f,0.0f,  1.0f,1.0f,
+	0.5f,-0.5f,0.0f,   0.0f,1.0f,0.0f,  1.0f,0.0f,
+	-0.5f,-0.5f,0.0f,  0.0f,0.0f,1.0f,  0.0f,0.0f,
+	-0.5,0.5,0.0f,     0.0f,1.0f,1.0f,  0.0f,1.0f
 };
 
 unsigned int indices[] = {
@@ -70,20 +71,29 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);//set first attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);//set first attribute
 	glEnableVertexAttribArray(0);//enabel a generic buffer attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));//set second attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));//set second attribute
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));//set second attribute
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-	
 
-	std::string path =  Chelp::getDirectory();
+	std::string path = Chelp::getDirectory();
 	std::string vsPath = path + std::string("\\Shader\\shader.vs");
 	std::string fsPath = path + std::string("\\Shader\\shader.fs");
+	std::string picPath = path + std::string("\\Shader\\container.jpg");
+	std::string picPath2 = path + std::string("\\Shader\\awesomeface.png");
+
+	CTexture tex1(picPath.c_str(),GL_RGB,false);
+	CTexture tex2(picPath2.c_str(),GL_RGBA,true);
+	
 	CShader ourShader(vsPath.c_str(),fsPath.c_str());
 	ourShader.use();
+	ourShader.setInt("texture1", 0);
+	ourShader.setInt("texture2", 1);
 
 	while (!glfwWindowShouldClose(window))//if GLFW has been instructed to close
 	{
@@ -101,6 +111,10 @@ int main()
 
 		//
 		//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex1.m_TexID);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, tex2.m_TexID);
 		glBindVertexArray(VAO);//bind VAO auto bind EBO
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -109,6 +123,10 @@ int main()
 		glfwSwapBuffers(window);//swap color buffer
 		glfwPollEvents();//check if any events are triggered(keyborad mousemove)
 	}
+
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 
 	glfwTerminate();
 	return 0;
