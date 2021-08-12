@@ -21,6 +21,7 @@ public:
 	void setBool(const std::string& name, bool value) const;
 	void setInt(const std::string& name, int value) const;
 	void setFloat(const std::string& name, float value) const;
+	void setMatrix4fv(const std::string& name, const float* value) const;
 
 private:
 
@@ -133,4 +134,10 @@ inline void CShader::setInt(const std::string& name, int value) const
 inline void CShader::setFloat(const std::string& name, float value) const
 {
 	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+}
+
+inline void CShader::setMatrix4fv(const std::string& name,const float* value) const
+{
+	unsigned int transformLoc = glGetUniformLocation(ID, name.c_str());
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, value);
 }

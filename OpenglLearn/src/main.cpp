@@ -4,6 +4,7 @@
 #include"Shader.h"
 #include"Help.h"
 #include"Texture.h"
+#include"Matirx.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -95,6 +96,8 @@ int main()
 	ourShader.setInt("texture1", 0);
 	ourShader.setInt("texture2", 1);
 
+	
+	
 	while (!glfwWindowShouldClose(window))//if GLFW has been instructed to close
 	{
 		processInput(window);
@@ -104,7 +107,12 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		
-
+		glm::mat4 trans = glm::mat4(1.0f);
+		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+		trans = glm::translate(trans, glm::vec3(0.5, -0.5, 0.0));
+		
+		//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+		ourShader.setMatrix4fv("transform", glm::value_ptr(trans));
 		//float timeValue = glfwGetTime();
 		//float greenValue = (sin(timeValue) / 2.0) + 0.5;
 		//int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
